@@ -1,0 +1,361 @@
+{% extends "base.html" %}
+
+{% block title %}{{ product.name }} - FurnishFusion{% endblock %}
+
+{% block content %}
+<div class="product-detail-container">
+    <div class="breadcrumb">
+        <a href="{{ url_for('home') }}">Home</a> / 
+        <a href="{{ url_for('products') }}">Products</a> / 
+        <span>{{ product.name }}</span>
+    </div>
+
+    <div class="product-detail-grid">
+        <!-- Product Image -->
+        <div class="product-image-section">
+            <div class="main-image">
+                <div class="placeholder-image">🛋️</div>
+            </div>
+        </div>
+
+        <!-- Product Information -->
+        <div class="product-info-section">
+            <h1 class="product-title">{{ product.name }}</h1>
+            
+            <div class="product-category">
+                <span class="category-label">Category:</span>
+                <span class="category-value">{{ product.category }}</span>
+            </div>
+
+            <div class="product-price">
+                <span class="price-label">Price:</span>
+                <span class="price-value">${{ "%.2f"|format(product.price) }}</span>
+            </div>
+
+            <div class="product-stock">
+                {% if product.stock|int > 0 %}
+                    <span class="stock-available">✅ {{ product.stock }} items in stock</span>
+                {% else %}
+                    <span class="stock-unavailable">❌ Out of stock</span>
+                {% endif %}
+            </div>
+
+            <div class="product-description">
+                <h3>Description</h3>
+                <p>{{ product.description }}</p>
+            </div>
+
+            <!-- Add to Cart Form -->
+            {% if session.user_id %}
+                {% if product.stock|int > 0 %}
+                    <form method="POST" action="{{ url_for('add_to_cart') }}" class="add-to-cart-form">
+                        <input type="hidden" name="product_id" value="{{ product.product_id }}">
+                        
+                        <div class="quantity-section">
+                            <label for="quantity">Quantity:</label>
+                            <select name="quantity" id="quantity" class="quantity-select">
+                                {% for i in range(1, [(product.stock|int) + 1, 11]|min) %}
+                                    <option value="{{ i }}">{{ i }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+
+                        <button type="submit" class="btn btn-primary btn-large add-to-cart-btn">
+                            🛒 Add to Cart
+                        </button>
+                    </form>
+                {% else %}
+                    <div class="out-of-stock-notice">
+                        <p>This item is currently out of stock.</p>
+                    </div>
+                {% endif %}
+            {% else %}
+                <div class="login-notice">
+                    <p>Please <a href="{{ url_for('login') }}">login</a> to add items to your cart.</p>
+                </div>
+            {% endif %}
+
+            <!-- Product Actions -->
+            <div class="product-actions">
+                <a href="{{ url_for('products') }}" class="btn btn-secondary">← Back to Products</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Product Details Section -->
+    <div class="additional-info">
+        <div class="info-tabs">
+            <div class="tab-content">
+                <h3>Product Information</h3>
+                <div class="info-grid">
+                    <div class="info-item">
+                        <strong>Product ID:</strong>
+                        <span>{{ product.product_id[:8] }}...</span>
+                    </div>
+                    <div class="info-item">
+                        <strong>Category:</strong>
+                        <span>{{ product.category }}</span>
+                    </div>
+                    <div class="info-item">
+                        <strong>Availability:</strong>
+                        <span>{% if product.stock|int > 0 %}In Stock ({{ product.stock }} units){% else %}Out of Stock{% endif %}</span>
+                    </div>
+                    {% if product.created_at %}
+                        <div class="info-item">
+                            <strong>Added:</strong>
+                            <span>{{ product.created_at[:10] }}</span>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.product-detail-container {
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.breadcrumb {
+    margin-bottom: 30px;
+    padding: 10px 0;
+    color: #666;
+}
+
+.breadcrumb a {
+    color: #3498db;
+    text-decoration: none;
+}
+
+.breadcrumb a:hover {
+    text-decoration: underline;
+}
+
+.product-detail-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 40px;
+    margin-bottom: 40px;
+}
+
+.product-image-section {
+    background: white;
+    border-radius: 10px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    overflow: hidden;
+}
+
+.main-image {
+    height: 500px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #f8f9fa;
+}
+
+.placeholder-image {
+    font-size: 8rem;
+    color: #bdc3c7;
+}
+
+.product-info-section {
+    background: white;
+    padding: 30px;
+    border-radius: 10px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+}
+
+.product-title {
+    font-size: 2.2rem;
+    color: #2c3e50;
+    margin-bottom: 20px;
+    line-height: 1.3;
+}
+
+.product-category,
+.product-price,
+.product-stock {
+    margin-bottom: 20px;
+    font-size: 1.1rem;
+}
+
+.category-label,
+.price-label {
+    font-weight: bold;
+    color: #555;
+}
+
+.category-value {
+    background: #3498db;
+    color: white;
+    padding: 4px 12px;
+    border-radius: 15px;
+    font-size: 0.9rem;
+    margin-left: 10px;
+}
+
+.price-value {
+    font-size: 1.8rem;
+    font-weight: bold;
+    color: #27ae60;
+    margin-left: 10px;
+}
+
+.stock-available {
+    color: #27ae60;
+    font-weight: bold;
+}
+
+.stock-unavailable {
+    color: #e74c3c;
+    font-weight: bold;
+}
+
+.product-description {
+    margin: 30px 0;
+    padding: 20px 0;
+    border-top: 1px solid #eee;
+    border-bottom: 1px solid #eee;
+}
+
+.product-description h3 {
+    color: #2c3e50;
+    margin-bottom: 15px;
+}
+
+.product-description p {
+    line-height: 1.6;
+    color: #666;
+}
+
+.add-to-cart-form {
+    margin: 30px 0;
+}
+
+.quantity-section {
+    margin-bottom: 20px;
+}
+
+.quantity-section label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: bold;
+    color: #555;
+}
+
+.quantity-select {
+    padding: 10px;
+    border: 2px solid #ddd;
+    border-radius: 5px;
+    font-size: 16px;
+    width: 80px;
+}
+
+.btn-large {
+    padding: 15px 30px;
+    font-size: 1.1rem;
+    font-weight: bold;
+}
+
+.add-to-cart-btn {
+    background: linear-gradient(135deg, #27ae60, #2ecc71);
+    border: none;
+    color: white;
+    width: 100%;
+    transition: all 0.3s ease;
+}
+
+.add-to-cart-btn:hover {
+    background: linear-gradient(135deg, #229954, #27ae60);
+    transform: translateY(-2px);
+}
+
+.out-of-stock-notice,
+.login-notice {
+    background: #f8f9fa;
+    padding: 20px;
+    border-radius: 5px;
+    text-align: center;
+    margin: 20px 0;
+}
+
+.login-notice a {
+    color: #3498db;
+    text-decoration: none;
+    font-weight: bold;
+}
+
+.login-notice a:hover {
+    text-decoration: underline;
+}
+
+.product-actions {
+    margin-top: 30px;
+    padding-top: 20px;
+    border-top: 1px solid #eee;
+}
+
+.additional-info {
+    background: white;
+    padding: 30px;
+    border-radius: 10px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+}
+
+.tab-content h3 {
+    color: #2c3e50;
+    margin-bottom: 20px;
+}
+
+.info-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 15px;
+}
+
+.info-item {
+    display: flex;
+    justify-content: space-between;
+    padding: 10px 0;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+.info-item strong {
+    color: #555;
+}
+
+@media (max-width: 768px) {
+    .product-detail-grid {
+        grid-template-columns: 1fr;
+        gap: 20px;
+    }
+    
+    .main-image {
+        height: 300px;
+    }
+    
+    .placeholder-image {
+        font-size: 4rem;
+    }
+    
+    .product-info-section {
+        padding: 20px;
+    }
+    
+    .product-title {
+        font-size: 1.8rem;
+    }
+    
+    .info-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .info-item {
+        flex-direction: column;
+        gap: 5px;
+    }
+}
+</style>
+{% endblock %}

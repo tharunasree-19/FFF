@@ -1,0 +1,94 @@
+{% extends "base.html" %}
+
+{% block title %}Checkout - FurnishFusion{% endblock %}
+
+{% block content %}
+<h1 class="text-center mb-20">Checkout</h1>
+
+<div class="grid grid-2" style="gap: 40px;">
+    <!-- Order Summary -->
+    <div class="card">
+        <div class="card-body">
+            <h3 style="color: #2c3e50; margin-bottom: 20px;">Order Summary</h3>
+            
+            {% for item in cart_items %}
+            <div style="display: flex; justify-content: space-between; align-items: center; padding: 15px 0; border-bottom: 1px solid #eee;">
+                <div>
+                    <h4 style="margin-bottom: 5px;">{{ item.product.name }}</h4>
+                    <p style="color: #666; margin: 0;">Quantity: {{ item.cart_item.quantity }}</p>
+                    <p style="color: #666; margin: 0;">${{ "%.2f"|format(item.product.price) }} each</p>
+                </div>
+                <div style="text-align: right;">
+                    <strong>${{ "%.2f"|format(item.item_total) }}</strong>
+                </div>
+            </div>
+            {% endfor %}
+            
+            <div style="padding: 20px 0; border-top: 2px solid #2c3e50; margin-top: 20px;">
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <h3 style="color: #2c3e50;">Total Amount:</h3>
+                    <h3 style="color: #e74c3c;">${{ "%.2f"|format(total_amount) }}</h3>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Delivery Information -->
+    <div class="card">
+        <div class="card-body">
+            <h3 style="color: #2c3e50; margin-bottom: 20px;">Delivery Information</h3>
+            
+            <form method="POST" action="{{ url_for('place_order') }}">
+                <div class="form-group">
+                    <label for="delivery_address">Delivery Address</label>
+                    <textarea id="delivery_address" name="delivery_address" rows="4" required>{{ user.address if user.address else '' }}</textarea>
+                </div>
+
+                <div class="form-group">
+                    <label for="phone">Phone Number</label>
+                    <input type="tel" id="phone" name="phone" value="{{ user.phone if user.phone else '' }}" required>
+                </div>
+
+                <div style="background-color: #f8f9fa; padding: 15px; border-radius: 5px; margin-bottom: 20px;">
+                    <h4 style="color: #2c3e50; margin-bottom: 10px;">📦 Delivery Information</h4>
+                    <p style="margin: 5px 0; color: #666;">• Estimated delivery: 7 business days</p>
+                    <p style="margin: 5px 0; color: #666;">• Free delivery on orders over $500</p>
+                    <p style="margin: 5px 0; color: #666;">• Delivery fee: $25 (if under $500)</p>
+                </div>
+
+                <div style="background-color: #e8f4fd; padding: 15px; border-radius: 5px; margin-bottom: 20px;">
+                    <h4 style="color: #2c3e50; margin-bottom: 10px;">💳 Payment Information</h4>
+                    <p style="margin: 5px 0; color: #666;">• Cash on delivery available</p>
+                    <p style="margin: 5px 0; color: #666;">• Credit/Debit cards accepted</p>
+                    <p style="margin: 5px 0; color: #666;">• Digital payment options available</p>
+                </div>
+
+                <button type="submit" class="btn btn-primary btn-full" style="padding: 15px; font-size: 18px; font-weight: bold;">
+                    Place Order - ${{ "%.2f"|format(total_amount) }}
+                </button>
+            </form>
+
+            <div class="text-center mt-20">
+                <a href="{{ url_for('view_cart') }}" class="btn btn-secondary">Back to Cart</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .card {
+        margin-bottom: 20px;
+    }
+    
+    .form-group textarea {
+        resize: vertical;
+        font-family: inherit;
+    }
+    
+    @media (max-width: 768px) {
+        .grid-2 {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
+{% endblock %}

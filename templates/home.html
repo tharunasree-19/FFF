@@ -1,0 +1,198 @@
+{% extends "base.html" %}
+
+{% block title %}FurnishFusion - Premium Furniture Store{% endblock %}
+
+{% block content %}
+<style>
+    .hero {
+        background: linear-gradient(rgba(44, 62, 80, 0.8), rgba(52, 73, 94, 0.8)), url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 600"><rect fill="%23f0f0f0" width="1200" height="600"/><text x="600" y="300" text-anchor="middle" font-size="48" fill="%23ccc">Furniture Background</text></svg>');
+        background-size: cover;
+        background-position: center;
+        color: white;
+        padding: 80px 20px;
+        text-align: center;
+        margin-bottom: 40px;
+    }
+
+    .hero h1 {
+        font-size: 3rem;
+        margin-bottom: 20px;
+        font-weight: bold;
+    }
+
+    .hero p {
+        font-size: 1.2rem;
+        margin-bottom: 30px;
+        max-width: 600px;
+        margin-left: auto;
+        margin-right: auto;
+    }
+
+    .product-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 30px;
+        margin-top: 40px;
+    }
+
+    .product-card {
+        background: white;
+        border-radius: 10px;
+        overflow: hidden;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        transition: transform 0.3s ease;
+    }
+
+    .product-card:hover {
+        transform: translateY(-5px);
+    }
+
+    .product-image {
+        height: 200px;
+        background: linear-gradient(45deg, #f8f9fa, #e9ecef);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 4rem;
+        color: #6c757d;
+    }
+
+    .product-info {
+        padding: 20px;
+    }
+
+    .product-info h3 {
+        font-size: 1.3rem;
+        margin-bottom: 10px;
+        color: #2c3e50;
+    }
+
+    .product-info p {
+        color: #666;
+        margin-bottom: 15px;
+        font-size: 0.9rem;
+    }
+
+    .product-price {
+        font-size: 1.4rem;
+        font-weight: bold;
+        color: #e74c3c;
+        margin-bottom: 15px;
+    }
+
+    .features {
+        background: white;
+        padding: 60px 20px;
+        margin: 40px 0;
+        border-radius: 10px;
+    }
+
+    .features-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 40px;
+        margin-top: 40px;
+    }
+
+    .feature {
+        text-align: center;
+    }
+
+    .feature-icon {
+        font-size: 3rem;
+        margin-bottom: 20px;
+    }
+
+    .feature h3 {
+        margin-bottom: 15px;
+        color: #2c3e50;
+    }
+
+    .section-title {
+        text-align: center;
+        font-size: 2.5rem;
+        margin-bottom: 20px;
+        color: #2c3e50;
+    }
+
+    .section-subtitle {
+        text-align: center;
+        font-size: 1.1rem;
+        color: #666;
+        margin-bottom: 40px;
+    }
+
+    @media (max-width: 768px) {
+        .hero h1 {
+            font-size: 2rem;
+        }
+        
+        .hero p {
+            font-size: 1rem;
+        }
+        
+        .product-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
+
+<div class="hero">
+    <h1>Welcome to FurnishFusion</h1>
+    <p>Transform your space with our premium furniture collection. Quality, style, and comfort - all in one place.</p>
+    <a href="{{ url_for('products') }}" class="btn btn-primary" style="font-size: 1.1rem; padding: 12px 30px;">Shop Now</a>
+</div>
+
+<section>
+    <h2 class="section-title">Featured Products</h2>
+    <p class="section-subtitle">Discover our most popular furniture pieces</p>
+    
+    {% if products %}
+        <div class="product-grid">
+            {% for product in products %}
+                <div class="product-card">
+                    <div class="product-image">
+                        🛋️
+                    </div>
+                    <div class="product-info">
+                        <h3>{{ product.name }}</h3>
+                        <p>{{ product.description[:100] }}{% if product.description|length > 100 %}...{% endif %}</p>
+                        <div class="product-price">${{ "%.2f"|format(product.price|float) }}</div>
+                        <a href="{{ url_for('product_detail', product_id=product.product_id) }}" class="btn btn-primary">View Details</a>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="text-center">
+            <p>No products available at the moment.</p>
+        </div>
+    {% endif %}
+</section>
+
+<section class="features">
+    <h2 class="section-title">Why Choose FurnishFusion?</h2>
+    <div class="features-grid">
+        <div class="feature">
+            <div class="feature-icon">✨</div>
+            <h3>Premium Quality</h3>
+            <p>All our furniture is crafted with the finest materials and attention to detail.</p>
+        </div>
+        <div class="feature">
+            <div class="feature-icon">🚚</div>
+            <h3>Free Delivery</h3>
+            <p>Enjoy free delivery on all orders. We bring your furniture right to your doorstep.</p>
+        </div>
+        <div class="feature">
+            <div class="feature-icon">💰</div>
+            <h3>Best Prices</h3>
+            <p>Competitive pricing without compromising on quality. Get the best value for your money.</p>
+        </div>
+        <div class="feature">
+            <div class="feature-icon">🛡️</div>
+            <h3>Warranty</h3>
+            <p>All products come with comprehensive warranty for your peace of mind.</p>
+        </div>
+    </div>
+</section>
+{% endblock %}

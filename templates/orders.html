@@ -1,0 +1,214 @@
+{% extends "base.html" %}
+
+{% block title %}My Orders - FurnishFusion{% endblock %}
+
+{% block content %}
+<div style="max-width: 1000px; margin: 0 auto;">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px;">
+        <h1 style="color: #2c3e50;">My Orders</h1>
+        <a href="{{ url_for('products') }}" class="btn btn-primary">Continue Shopping</a>
+    </div>
+
+    {% if orders %}
+        <div class="grid" style="gap: 20px;">
+            {% for order in orders %}
+            <div class="card">
+                <div class="card-body">
+                    <!-- Order Header -->
+                    <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 20px; padding-bottom: 15px; border-bottom: 1px solid #eee;">
+                        <div>
+                            <h3 style="color: #2c3e50; margin-bottom: 5px;">Order #{{ order['order_id'][:8] }}...</h3>
+                            <p style="color: #666; margin: 0;">Placed on {{ order['created_at'][:19] | replace('T', ' ') }}</p>
+                        </div>
+                        <div style="text-align: right;">
+                            <span class="order-status order-status-{{ order['status'] }}">
+                                {{ order['status'].title() }}
+                            </span>
+                            <p style="margin: 5px 0 0 0; font-weight: bold; font-size: 18px; color: #e74c3c;">
+                                ${{ "%.2f"|format(order['total_amount']) }}
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- Order Items -->
+                    <div class="order-items">
+                        <h4 style="color: #555; margin-bottom: 15px;">Items ({{ order['items']|length }})</h4>
+                        
+                        {% for item in order['items'] %}
+                        <div class="order-item {% if not loop.last %}order-item-border{% endif %}">
+                            <div style="flex: 1;">
+                                <h5 style="margin-bottom: 5px; color: #333;">{{ item['product_name'] }}</h5>
+                                <p style="color: #666; margin: 0; font-size: 14px;">
+                                    Quantity: {{ item['quantity'] }} × ${{ "%.2f"|format(item['price']) }}
+                                </p>
+                            </div>
+                            <div style="text-align: right;">
+                                <strong>${{ "%.2f"|format(item['item_total']) }}</strong>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+
+                    <!-- Delivery Information -->
+                    <div style="background-color: #f8f9fa; padding: 15px; border-radius: 5px; margin-top: 20px;">
+                        <div class="grid grid-2">
+                            <div>
+                                <h5 style="color: #555; margin-bottom: 8px;">📍 Delivery Address</h5>
+                                <p style="margin: 0; font-size: 14px; color: #666;">{{ order['delivery_address'] }}</p>
+                            </div>
+                            <div>
+                                <h5 style="color: #555; margin-bottom: 8px;">📞 Phone</h5>
+                                <p style="margin: 0; font-size: 14px; color: #666;">{{ order['phone'] }}</p>
+                            </div>
+                        </div>
+                        
+                        {% if order['estimated_delivery'] %}
+                        <div style="margin-top: 10px;">
+                            <h5 style="color: #555; margin-bottom: 8px;">🚚 Estimated Delivery</h5>
+                            <p style="margin: 0; font-size: 14px; color: #666;">{{ order['estimated_delivery'][:10] }}</p>
+                        </div>
+                        {% endif %}
+                    </div>
+
+                    <!-- Order Actions -->
+                    <div style="text-align: right; margin-top: 20px;">
+                        <a href="{{ url_for('order_confirmation', order_id=order['order_id']) }}" class="btn btn-secondary">
+                            View Details
+                        </a>
+                        
+                        {% if order['status'] == 'pending' %}
+                        <button class="btn btn-outline" onclick="alert('Order cancellation feature coming soon!')" style="margin-left: 10px; background: none; border: 1px solid #dc3545; color: #dc3545;">
+                            Cancel Order
+                        </button>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+
+        <!-- Order Summary Stats -->
+        <div class="card" style="margin-top: 30px;">
+            <div class="card-body">
+                <h3 style="color: #2c3e50; margin-bottom: 20px;">Order Summary</h3>
+                
+                <div class="grid grid-3">
+                    <div style="text-align: center; padding: 20px;">
+                        <div style="font-size: 32px; font-weight: bold; color: #3498db; margin-bottom: 5px;">
+                            {{ orders|length }}
+                        </div>
+                        <p style="color: #666; margin: 0;">Total Orders</p>
+                    </div>
+                    
+                    <div style="text-align: center; padding: 20px;">
+                        <div style="font-size: 32px; font-weight: bold; color: #27ae60; margin-bottom: 5px;">
+                            ${{ "%.2f"|format(orders|sum(attribute='total_amount')) }}
+                        </div>
+                        <p style="color: #666; margin: 0;">Total Spent</p>
+                    </div>
+                    
+                    <div style="text-align: center; padding: 20px;">
+                        <div style="font-size: 32px; font-weight: bold; color: #f39c12; margin-bottom: 5px;">
+                            {{ orders|selectattr("status", "equalto", "pending")|list|length }}
+                        </div>
+                        <p style="color: #666; margin: 0;">Pending Orders</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    {% else %}
+        <!-- Empty State -->
+        <div class="card">
+            <div class="card-body text-center" style="padding: 60px 20px;">
+                <div style="font-size: 64px; color: #bdc3c7; margin-bottom: 20px;">📦</div>
+                <h2 style="color: #7f8c8d; margin-bottom: 15px;">No Orders Yet</h2>
+                <p style="color: #95a5a6; margin-bottom: 30px; font-size: 16px;">
+                    You haven't placed any orders yet. Start shopping to see your orders here!
+                </p>
+                <a href="{{ url_for('products') }}" class="btn btn-primary" style="padding: 12px 30px; font-size: 16px;">
+                    Start Shopping
+                </a>
+            </div>
+        </div>
+    {% endif %}
+</div>
+
+<style>
+    .order-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 10px 0;
+    }
+    
+    .order-item-border {
+        border-bottom: 1px solid #f0f0f0;
+    }
+    
+    .order-status {
+        padding: 6px 12px;
+        border-radius: 20px;
+        font-size: 12px;
+        font-weight: bold;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+    
+    .order-status-pending {
+        background-color: #fff3cd;
+        color: #856404;
+    }
+    
+    .order-status-processing {
+        background-color: #cce5ff;
+        color: #0066cc;
+    }
+    
+    .order-status-shipped {
+        background-color: #d4edda;
+        color: #155724;
+    }
+    
+    .order-status-delivered {
+        background-color: #d1ecf1;
+        color: #0c5460;
+    }
+    
+    .order-status-cancelled {
+        background-color: #f8d7da;
+        color: #721c24;
+    }
+    
+    .btn-outline {
+        padding: 8px 16px;
+        border-radius: 5px;
+        text-decoration: none;
+        font-weight: 500;
+        transition: all 0.3s ease;
+        cursor: pointer;
+        display: inline-block;
+    }
+    
+    .btn-outline:hover {
+        background-color: #dc3545;
+        color: white;
+    }
+    
+    @media (max-width: 768px) {
+        .grid-2, .grid-3 {
+            grid-template-columns: 1fr;
+        }
+        
+        .card-body > div:first-child {
+            flex-direction: column;
+            align-items: start !important;
+            gap: 10px;
+        }
+        
+        .card-body > div:first-child > div:last-child {
+            text-align: left !important;
+        }
+    }
+</style>
+{% endblock %}

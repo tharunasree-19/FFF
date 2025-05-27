@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+
+{% block title %}Page Not Found - FurnishFusion{% endblock %}
+
+{% block content %}
+<div class="card" style="max-width: 600px; margin: 50px auto;">
+    <div class="card-body text-center" style="padding: 60px 40px;">
+        <div style="font-size: 120px; color: #e74c3c; margin-bottom: 20px;">🔍</div>
+        <h1 style="font-size: 48px; color: #2c3e50; margin-bottom: 15px;">404</h1>
+        <h2 style="color: #7f8c8d; margin-bottom: 20px;">Oops! Page Not Found</h2>
+        <p style="color: #95a5a6; margin-bottom: 40px; font-size: 16px; line-height: 1.6;">
+            The page you're looking for seems to have been moved, deleted, or doesn't exist. 
+            Don't worry, let's get you back on track!
+        </p>
+        
+        <div style="display: flex; gap: 15px; justify-content: center; flex-wrap: wrap;">
+            <a href="{{ url_for('home') }}" class="btn btn-primary" style="padding: 12px 24px;">
+                🏠 Go Home
+            </a>
+            <a href="{{ url_for('products') }}" class="btn btn-secondary" style="padding: 12px 24px;">
+                🛋️ Browse Products
+            </a>
+        </div>
+        
+        <div style="margin-top: 40px; padding-top: 30px; border-top: 1px solid #ecf0f1;">
+            <p style="color: #bdc3c7; font-size: 14px;">
+                If you believe this is an error, please 
+                <a href="mailto:support@furnishfusion.com" style="color: #3498db;">contact our support team</a>
+            </p>
+        </div>
+    </div>
+</div>
+
+<style>
+    @media (max-width: 768px) {
+        .card-body {
+            padding: 40px 20px !important;
+        }
+        
+        h1 {
+            font-size: 36px !important;
+        }
+        
+        .btn {
+            width: 100% !important;
+            margin-bottom: 10px !important;
+        }
+    }
+</style>
+{% endblock %}

@@ -1,0 +1,372 @@
+{% extends "base.html" %}
+
+{% block title %}Shopping Cart - FurnishFusion{% endblock %}
+
+{% block content %}
+<div class="cart-container">
+    <div class="cart-header">
+        <h1>🛒 Your Shopping Cart</h1>
+        <a href="{{ url_for('products') }}" class="btn btn-secondary">← Continue Shopping</a>
+    </div>
+
+    {% if cart_items %}
+        <div class="cart-content">
+            <!-- Cart Items -->
+            <div class="cart-items-section">
+                {% for item in cart_items %}
+                    <div class="cart-item card">
+                        <div class="item-image">
+                            <div class="placeholder-image">🛋️</div>
+                        </div>
+                        
+                        <div class="item-details">
+                            <h3 class="item-name">
+                                <a href="{{ url_for('product_detail', product_id=item.product.product_id) }}">
+                                    {{ item.product.name }}
+                                </a>
+                            </h3>
+                            <p class="item-description">{{ item.product.description[:80] }}...</p>
+                            <div class="item-category">
+                                <span class="category-tag">{{ item.product.category }}</span>
+                            </div>
+                        </div>
+                        
+                        <div class="item-quantity">
+                            <span class="quantity-label">Quantity</span>
+                            <span class="quantity-value">{{ item.cart_item.quantity }}</span>
+                        </div>
+                        
+                        <div class="item-price">
+                            <div class="unit-price">
+                                <span class="price-label">Unit Price</span>
+                                <span class="price-value">${{ "%.2f"|format(item.product.price) }}</span>
+                            </div>
+                            <div class="total-price">
+                                <span class="price-label">Total</span>
+                                <span class="price-value total">${{ "%.2f"|format(item.item_total) }}</span>
+                            </div>
+                        </div>
+                        
+                        <div class="item-actions">
+                            <form method="POST" action="{{ url_for('remove_from_cart') }}" class="remove-form">
+                                <input type="hidden" name="product_id" value="{{ item.product.product_id }}">
+                                <button type="submit" class="btn-remove" onclick="return confirm('Remove this item from cart?')">
+                                    🗑️ Remove
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+            
+            <!-- Cart Summary -->
+            <div class="cart-summary card">
+                <h2>Order Summary</h2>
+                
+                <div class="summary-details">
+                    <div class="summary-row">
+                        <span>Items ({{ cart_items|length }})</span>
+                        <span>${{ "%.2f"|format(total_amount) }}</span>
+                    </div>
+                    <div class="summary-row">
+                        <span>Shipping</span>
+                        <span>FREE</span>
+                    </div>
+                    <div class="summary-row total-row">
+                        <span>Total</span>
+                        <span>${{ "%.2f"|format(total_amount) }}</span>
+                    </div>
+                </div>
+                
+                <div class="checkout-actions">
+                    <a href="{{ url_for('checkout') }}" class="btn btn-primary btn-large checkout-btn">
+                        Proceed to Checkout
+                    </a>
+                    <p class="secure-checkout">🔒 Secure Checkout</p>
+                </div>
+            </div>
+        </div>
+    {% else %}
+        <div class="empty-cart">
+            <div class="empty-cart-icon">🛒</div>
+            <h2>Your cart is empty</h2>
+            <p>Looks like you haven't added any items to your cart yet.</p>
+            <a href="{{ url_for('products') }}" class="btn btn-primary btn-large">
+                Start Shopping
+            </a>
+        </div>
+    {% endif %}
+</div>
+
+<style>
+.cart-container {
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.cart-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 30px;
+    padding-bottom: 20px;
+    border-bottom: 2px solid #eee;
+}
+
+.cart-header h1 {
+    color: #2c3e50;
+    font-size: 2.2rem;
+}
+
+.cart-content {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 30px;
+}
+
+.cart-items-section {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.cart-item {
+    display: grid;
+    grid-template-columns: 120px 1fr auto auto auto;
+    gap: 20px;
+    align-items: center;
+    padding: 20px;
+    transition: transform 0.2s ease;
+}
+
+.cart-item:hover {
+    transform: translateY(-2px);
+}
+
+.item-image {
+    height: 100px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #f8f9fa;
+    border-radius: 8px;
+}
+
+.placeholder-image {
+    font-size: 2.5rem;
+    color: #bdc3c7;
+}
+
+.item-details {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.item-name a {
+    color: #2c3e50;
+    text-decoration: none;
+    font-size: 1.2rem;
+    font-weight: bold;
+}
+
+.item-name a:hover {
+    color: #3498db;
+}
+
+.item-description {
+    color: #666;
+    font-size: 0.9rem;
+}
+
+.category-tag {
+    background: #3498db;
+    color: white;
+    padding: 2px 8px;
+    border-radius: 12px;
+    font-size: 0.8rem;
+}
+
+.item-quantity,
+.item-price {
+    text-align: center;
+}
+
+.quantity-label,
+.price-label {
+    display: block;
+    font-size: 0.8rem;
+    color: #666;
+    margin-bottom: 4px;
+}
+
+.quantity-value {
+    font-weight: bold;
+    font-size: 1.1rem;
+    color: #2c3e50;
+}
+
+.price-value {
+    font-weight: bold;
+    color: #27ae60;
+}
+
+.price-value.total {
+    font-size: 1.2rem;
+    color: #2c3e50;
+}
+
+.unit-price {
+    margin-bottom: 10px;
+}
+
+.btn-remove {
+    background: #e74c3c;
+    color: white;
+    border: none;
+    padding: 8px 12px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    transition: background 0.3s ease;
+}
+
+.btn-remove:hover {
+    background: #c0392b;
+}
+
+.cart-summary {
+    height: fit-content;
+    padding: 25px;
+    position: sticky;
+    top: 20px;
+}
+
+.cart-summary h2 {
+    color: #2c3e50;
+    margin-bottom: 20px;
+    text-align: center;
+}
+
+.summary-details {
+    margin-bottom: 25px;
+}
+
+.summary-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 10px 0;
+    border-bottom: 1px solid #eee;
+}
+
+.summary-row.total-row {
+    border-top: 2px solid #2c3e50;
+    border-bottom: 2px solid #2c3e50;
+    font-weight: bold;
+    font-size: 1.2rem;
+    margin-top: 10px;
+    padding-top: 15px;
+}
+
+.checkout-actions {
+    text-align: center;
+}
+
+.btn-large {
+    padding: 15px 30px;
+    font-size: 1.1rem;
+    font-weight: bold;
+}
+
+.checkout-btn {
+    background: linear-gradient(135deg, #27ae60, #2ecc71);
+    border: none;
+    color: white;
+    width: 100%;
+    transition: all 0.3s ease;
+}
+
+.checkout-btn:hover {
+    background: linear-gradient(135deg, #229954, #27ae60);
+    transform: translateY(-2px);
+}
+
+.secure-checkout {
+    margin-top: 10px;
+    font-size: 0.9rem;
+    color: #27ae60;
+}
+
+.empty-cart {
+    text-align: center;
+    padding: 80px 20px;
+    background: white;
+    border-radius: 10px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+}
+
+.empty-cart-icon {
+    font-size: 5rem;
+    margin-bottom: 20px;
+    opacity: 0.5;
+}
+
+.empty-cart h2 {
+    color: #7f8c8d;
+    margin-bottom: 10px;
+}
+
+.empty-cart p {
+    color: #95a5a6;
+    margin-bottom: 30px;
+}
+
+@media (max-width: 968px) {
+    .cart-content {
+        grid-template-columns: 1fr;
+        gap: 20px;
+    }
+    
+    .cart-summary {
+        position: static;
+        order: -1;
+    }
+}
+
+@media (max-width: 768px) {
+    .cart-header {
+        flex-direction: column;
+        gap: 15px;
+        text-align: center;
+    }
+    
+    .cart-item {
+        grid-template-columns: 1fr;
+        text-align: center;
+        gap: 15px;
+    }
+    
+    .item-image {
+        justify-self: center;
+        width: 120px;
+    }
+    
+    .item-details {
+        text-align: center;
+    }
+    
+    .item-quantity,
+    .item-price {
+        display: flex;
+        justify-content: space-between;
+        padding: 10px 0;
+        border-top: 1px solid #eee;
+    }
+    
+    .price-label,
+    .quantity-label {
+        text-align: left;
+    }
+}
+</style>
+{% endblock %}

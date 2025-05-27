@@ -1,0 +1,69 @@
+{% extends "base.html" %}
+
+{% block title %}Add Product - FurnishFusion{% endblock %}
+
+{% block content %}
+<div class="form-container">
+    <h2 class="text-center mb-20">Add New Product</h2>
+    
+    <form method="POST">
+        <div class="form-group">
+            <label for="name">Product Name</label>
+            <input type="text" id="name" name="name" required>
+        </div>
+
+        <div class="form-group">
+            <label for="description">Description</label>
+            <textarea id="description" name="description" rows="4" required></textarea>
+        </div>
+
+        <div class="form-group">
+            <label for="price">Price ($)</label>
+            <input type="number" id="price" name="price" step="0.01" min="0" required>
+        </div>
+
+        <div class="form-group">
+            <label for="category">Category</label>
+            <select id="category" name="category" required>
+                <option value="">Select Category</option>
+                <option value="Living Room">Living Room</option>
+                <option value="Bedroom">Bedroom</option>
+                <option value="Dining Room">Dining Room</option>
+                <option value="Office">Office</option>
+                <option value="Kitchen">Kitchen</option>
+                <option value="Bathroom">Bathroom</option>
+                <option value="Outdoor">Outdoor</option>
+                <option value="Storage">Storage</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label for="stock">Stock Quantity</label>
+            <input type="number" id="stock" name="stock" min="0" required>
+        </div>
+
+        <button type="submit" class="btn btn-primary btn-full">Add Product</button>
+    </form>
+
+    <div class="text-center mt-20">
+        <a href="{{ url_for('products') }}" class="btn btn-secondary">Back to Products</a>
+    </div>
+</div>
+
+<style>
+    .form-container h2 {
+        color: #2c3e50;
+        margin-bottom: 30px;
+    }
+    
+    .form-group textarea {
+        resize: vertical;
+        font-family: inherit;
+    }
+    
+    .form-group select {
+        background-color: white;
+        cursor: pointer;
+    }
+</style>
+{% endblock %}

@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+
+{% block title %}Server Error - FurnishFusion{% endblock %}
+
+{% block content %}
+<div class="text-center" style="padding: 80px 20px;">
+    <h1 style="font-size: 8rem; color: #e74c3c; margin-bottom: 20px;">500</h1>
+    <h2 style="color: #2c3e50; margin-bottom: 20px;">Internal Server Error</h2>
+    <p style="font-size: 1.2rem; color: #7f8c8d; margin-bottom: 30px;">
+        Something went wrong on our end. We're working to fix it!
+    </p>
+    <div style="display: flex; gap: 15px; justify-content: center; flex-wrap: wrap;">
+        <a href="{{ url_for('home') }}" class="btn btn-primary">Go Home</a>
+        <a href="javascript:history.back()" class="btn btn-secondary">Go Back</a>
+    </div>
+</div>
+
+<style>
+.server-error {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 40px;
+    border-radius: 10px;
+    margin: 20px 0;
+}
+</style>
+{% endblock %}
